@@ -1,16 +1,19 @@
-# My Chess Engine
-A chess engine capable of playing chess against a human or against itself. The engine uses a minimax algorithm to find the top move.
+# Klippfisk Chess Engine
 
-## How It's Made:
+A chess engine capable of playing a full chess game against a human or against itself.
 
-**Tech used:** Java
+## Getting Started
 
-This is a personal project that I started completely for fun. However, the scale of this project continues to grow and in the future I plan to submit this engine to chess engine tournaments. This project has been and continues to be completely written by me.
+Clone the repository:
 
-## How to Run:
-1. This requires git and a Java IDE
-2. Clone the repo
 ```sh
-   git clone https://github.com/github_username/repo_name.git
+git clone https://github.com/darcymccoy/klippfisk-chess-engine.git
 ```
-3. Run the file: src/chessengine/driver/Driver.java
+
+Run the [Driver.java](src/chessengine/driver/Driver.java) file to run locally.
+
+## Learn More
+
+This is a personal project that I started completely for fun. However, the scale of this project continues to grow and in the future I plan to submit this project to chess engine tournaments. This project has been and continues to be completely written by me.
+
+The engine uses a minimax algorithm along with a custom built evaluation function to find the top move.
