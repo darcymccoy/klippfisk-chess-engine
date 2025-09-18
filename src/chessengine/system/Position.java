@@ -189,8 +189,8 @@ public class Position {
 		} else {
 			moveInList.add(newMove);
 		}
-		for(Move move : moveInList) {
-			move.setOriginalPosition(this);
+		for (Move move : moveInList) {
+			move.setOriginalPosition(this.clone());
 		}
 		return moveInList;
 	}
@@ -581,6 +581,20 @@ public class Position {
 		Position other = (Position) obj;
 		return (whiteToPlay == other.whiteToPlay) && board.equals(other.board)
 				&& castlingRights.equals(other.castlingRights) && enPassantRights.equals(other.enPassantRights);
+	}
+
+	/**
+	 * @return the whiteToPlay
+	 */
+	public boolean isWhiteToPlay() {
+		return whiteToPlay;
+	}
+
+	/**
+	 * @param whiteToPlay the whiteToPlay to set
+	 */
+	public void setWhiteToPlay(boolean whiteToPlay) {
+		this.whiteToPlay = whiteToPlay;
 	}
 
 }

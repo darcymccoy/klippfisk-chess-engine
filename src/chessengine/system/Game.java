@@ -36,11 +36,14 @@ public abstract class Game {
 	/** The message to display the draw type. */
 	private String message;
 	
+	/** To track sufficient material */
+	private MaterialCount materialCount;
+	
 	/**
-	 * Default constructor (standard starting position and the game hasn't been started.
+	 * Default constructor (standard starting position and the game hasn't been started).
 	 */
 	public Game() {
-		this(false, new Position(), new LinkedList<Move>());
+		this(false, new Position(), new LinkedList<Move>(), new MaterialCount());
 	}
 
 	/**
@@ -50,10 +53,11 @@ public abstract class Game {
 	 * @param currentPosition the <code>Position</code> that the game will start from
 	 * @param movesMade <code>LinkedList</code> for the moves that have already been made
 	 */
-	public Game(boolean inGame, Position currentPosition, LinkedList<Move> movesMade) {
+	public Game(boolean inGame, Position currentPosition, LinkedList<Move> movesMade, MaterialCount materialCount) {
 		this.inGame = inGame;
 		this.currentPosition = currentPosition;
 		this.movesMade = movesMade;
+		this.materialCount = materialCount;
 		this.message = "";
 		this.engine = new Engine(currentPosition);
 	}
@@ -66,6 +70,7 @@ public abstract class Game {
 	public void addGameMove(Move move) {
 		currentPosition.makeMove(move);
 		movesMade.add(move);
+		materialCount.updateForMove(move);
 		if (isDraw())
 			stopGame();
 	}
@@ -94,13 +99,7 @@ public abstract class Game {
 	 * If there are no legal moves then the game is ended.
 	 */
 	public void letEngineMakeMove() {
-		try {
-			addGameMove(engine.findTopMove());
-		} catch (CheckmateException e) {
-			e.printStackTrace();
-		} catch (StalemateException e) {
-			e.printStackTrace();
-		}
+		addGameMove(engine.findTopMove());
 	}
 	
 	/**
@@ -171,7 +170,7 @@ public abstract class Game {
 	 *         <code>false</code> otherwise.
 	 */
 	private boolean isInsufficientMaterialDraw() {
-		return false;// To be written
+		return materialCount.isInsufficientMaterial();
 	}
 	
 	/**

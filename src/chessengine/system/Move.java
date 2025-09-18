@@ -31,6 +31,13 @@ public class Move {
 	private Position originalPosition;
 	
 	/**
+	 * Default constructor.
+	 */
+	public Move() {
+		this('0', 0, 0, '0', '0', new Position());
+	}
+	
+	/**
 	 * Class constructor specifying the piece, start and end squares of this move.
 	 * This can construct every move except for pawns promoting.
 	 * 
@@ -255,6 +262,20 @@ public class Move {
 	 */
 	public void setOriginalPosition(Position originalPosition) {
 		this.originalPosition = originalPosition;
+	}
+
+	/**
+	 * @return the endSqrContents
+	 */
+	public char getEndSqrContents() {
+		return endSqrContents;
+	}
+
+	/**
+	 * @param endSqrContents the endSqrContents to set
+	 */
+	public void setEndSqrContents(char endSqrContents) {
+		this.endSqrContents = endSqrContents;
 	}
 
 }

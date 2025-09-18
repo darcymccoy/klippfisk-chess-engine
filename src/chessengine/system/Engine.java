@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 /**
  * Calculation and evaluation engine for a chess position.
- * This class does not contain or store a chess position, and must 
- * be passed a legal chess position to return accurate results.
+ * This class contains a chess position and must be constructed
+ * with a legal chess position to return accurate results.
  * 
  * @author Darcy McCoy
  * @since 1.0
@@ -15,15 +15,13 @@ public class Engine {
 	/** <code>Position</code> to be searched for the top move. */
 	Position position;
 	
-	private static final int MAX_DEPTH = 0;
-	
 	/** Pawn values based on location (each integer corresponds to a square on the board). */
 	public static final int[] PAWN_VALUES = {0, 0, 0, 0, 0, 0, 0, 0, 
-			140, 140, 140, 140, 140, 140, 140, 140, 
-			110, 110, 110, 120, 120, 110, 110, 110, 
+			500, 500, 500, 500, 500, 500, 500, 500, 
+			160, 155, 150, 150, 150, 150, 155, 160, 
 			100, 100, 100, 120, 120, 100, 100, 100, 
 			80, 100, 100, 120, 120, 100, 100, 80, 
-			95, 100, 100, 110, 110, 100, 100, 96, 
+			95, 100, 100, 110, 110, 80, 100, 96, 
 			90, 100, 100, 90, 90, 100, 100, 90, 
 			0, 0, 0, 0, 0, 0, 0, 0};
 	
@@ -35,7 +33,7 @@ public class Engine {
 			500, 500, 500, 500, 500, 500, 500, 500, 
 			500, 500, 500, 500, 500, 500, 500, 500, 
 			500, 500, 500, 500, 500, 500, 500, 500, 
-			500, 500, 500, 519, 520, 505, 500, 500,};
+			500, 500, 500, 519, 520, 505, 500, 500};
 	
 	/** Knight values based on location (each integer corresponds to a square on the board). */
 	public static final int[] KNIGHT_VALUES = {200, 220, 220, 220, 220, 220, 220, 200, 
@@ -79,12 +77,12 @@ public class Engine {
 	
 	/** Pawn endgame values based on location (each integer corresponds to a square on the board). */
 	public static final int[] PAWN_ENDGAME_VALUES = {0, 0, 0, 0, 0, 0, 0, 0, 
-			160, 160, 160, 160, 160, 160, 160, 160, 
-			140, 135, 130, 130, 130, 130, 135, 140, 
-			120, 120, 120, 120, 120, 120, 120, 120, 
-			110, 110, 110, 120, 120, 110, 110, 110, 
+			510, 510, 510, 510, 510, 510, 510, 510, 
+			240, 220, 220, 250, 250, 220, 220, 240, 
+			210, 200, 200, 210, 210, 200, 200, 210, 
+			160, 150, 150, 160, 160, 150, 150, 160, 
 			100, 105, 105, 110, 110, 105, 105, 100, 
-			90, 100, 100, 90, 90, 100, 100, 90, 
+			90, 90, 90, 90, 90, 90, 90, 90, 
 			0, 0, 0, 0, 0, 0, 0, 0};
 	
 	/** King endgame values based on location (each integer corresponds to a square on the board). */
@@ -161,47 +159,79 @@ public class Engine {
 		return topMove;
 	}
 	
-	public Move findTopMove() throws CheckmateException, StalemateException {
-		Move topMove = null;
-		int topMoveMaxReply = Integer.MAX_VALUE;
-		LinkedList<Move> legalMoves = position.findLegalMoves();
-		for (Move move : legalMoves) {
-			Position tempPosition = position.clone();
-			tempPosition.makeMove(move);
-			int maxReply = 0;
-			try {
-				maxReply = findMaxReplyToMinimumDepth(0);
-			} catch (NoLegalMovesException e) {
-
-			}
-			if (maxReply < topMoveMaxReply) {
-				topMoveMaxReply = maxReply;
-				topMove = move;
-			}
-		}
-		return topMove;
+	/**
+	 * Finds the best move for the current position using the alpha beta search.
+	 * 
+	 * @return EngineMove the move that the engine evaluated to be the strongest
+	 */
+	public EngineMove findTopMove() {
+		return alphaBeta(position, 3, Integer.MIN_VALUE, Integer.MAX_VALUE);
 	}
 	
-	private int findMaxReplyToMinimumDepth(int depth) throws NoLegalMovesException {
+	/**
+	 * Alpha beta search algorithm (minimax using alpha beta pruning) that searches for the top move.
+	 * 
+	 * @param position the Position to be searched
+	 * @param depth how many moves to look ahead
+	 * @param alpha minimum score for the maximizing color
+	 * @param beta maximum score for the minimizing color
+	 * @return
+	 */
+	public static EngineMove alphaBeta(Position position, int depth, int alpha, int beta) {
+		boolean maximizingColor = position.isWhiteToPlay();
+		Move topMove = null;
+	    int topScore = getTopScore(maximizingColor);
+		LinkedList<Move> legalMoves = null;
 		
-		if (depth == MAX_DEPTH)
-			return position.evaluate();
-		
-		int maxReply = Integer.MAX_VALUE;
-		LinkedList<Move> legalMoves = position.findLegalMoves();
-		for (Move move : legalMoves) {
-			Position tempPosition = position.clone();
-			tempPosition.makeMove(move);
-			int testMaxReply = 0;
-
-			try {
-				testMaxReply = findMaxReplyToMinimumDepth(depth + 1);
-			} catch (NoLegalMovesException e) {
-
-			}
-			if (testMaxReply < maxReply)
-				maxReply = testMaxReply;
+		try {
+			legalMoves = position.findLegalMoves();
+		} catch (CheckmateException e) {
+			return new EngineMove(topScore);
+		} catch (StalemateException e) {
+			return new EngineMove(0);
 		}
-		return maxReply;
+	    if (depth == 0) {
+	      return new EngineMove(position.evaluate());
+	    }
+
+	    for (Move move : legalMoves) {
+	      position.makeMove(move);
+	      int score = alphaBeta(position, depth - 1, alpha, beta).getScore();
+	      position.undoMove(move);
+
+	      if (maximizingColor) {
+	        if (score > topScore) {
+	          topScore = score;
+	          topMove = move;
+	        }
+	        alpha = Math.max(alpha, score);
+	      } else {
+	        if (score < topScore) {
+	          topScore = score;
+	          topMove = move;
+	        }
+	        beta = Math.min(beta, score);
+	      }
+
+	      // Prune branches if possible
+	      if (alpha >= beta) {
+	        break;
+	      }
+	    }
+
+	    return new EngineMove(topMove, topScore);
+	  }
+	
+	/**
+	 * @param maximizingColor boolean whether to get white's top score
+	 * @return the maximum value for the corresponding color
+	 */
+	private static int getTopScore(boolean maximizingColor) {
+		if (maximizingColor) {
+			return Integer.MIN_VALUE;
+		} else {
+			return Integer.MAX_VALUE;
+		}
 	}
+
 }
